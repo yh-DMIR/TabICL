@@ -453,7 +453,8 @@ def main() -> None:
     except RuntimeError:
         pass
 
-    task_queue: mp.Queue = mp.Queue(maxsize=workers * 4)
+    task_queue: mp.Queue = mp.Queue()  # unbounded, won't block before workers start
+    #task_queue: mp.Queue = mp.Queue(maxsize=workers * 4)
 
     # Enqueue all tasks
     for train_csv, test_csv in pairs:
