@@ -53,6 +53,7 @@ COMMON_ARGS="
   --softmax-temp 0.9
   --checkpoint-version ${CKPT_VERSION}
   --model-path ${LOCAL_CKPT_PATH}
+  --verbose
 "
 
 
