@@ -15,6 +15,9 @@ Key features:
   - avg_accuracy_ok: mean accuracy over all OK results
   - avg_accuracy_ok_top_{27,63,154}: mean accuracy of top-N datasets by accuracy (descending),
     computed only if #OK-with-accuracy >= N.
+  - wall_seconds: total elapsed wall time of the whole run (from start to end)
+  - wall_time_hms: wall time formatted as H:MM:SS
+  - started_at / finished_at: timestamps (local time)
 
 Example:
   python benchmark_tabicl_dynamic.py \
@@ -106,6 +109,17 @@ def _default_all_out(out_dir: Path) -> Path:
 
 def _default_summary_txt(out_dir: Path) -> Path:
     return out_dir / "tabicl_results.summary.txt"
+
+
+def _fmt_hms(seconds: float) -> str:
+    """Format seconds -> H:MM:SS (rounded to nearest second)."""
+    if seconds is None:
+        return ""
+    total = int(round(seconds))
+    h = total // 3600
+    m = (total % 3600) // 60
+    s = total % 60
+    return f"{h}:{m:02d}:{s:02d}"
 
 
 # -----------------------------
@@ -299,11 +313,23 @@ def write_summary_txt(
     failed_ids: List[str],
     avg_acc: Optional[float],
     topn_avgs: Dict[int, float],
+    wall_seconds: Optional[float] = None,
+    started_at: Optional[str] = None,
+    finished_at: Optional[str] = None,
 ):
     lines: List[str] = []
     lines.append(f"root: {root}")
     lines.append(f"discovered_pairs: {discovered_pairs}")
     lines.append(f"processed_pairs: {processed_pairs}")
+
+    # ---- timing ----
+    if started_at is not None:
+        lines.append(f"started_at: {started_at}")
+    if finished_at is not None:
+        lines.append(f"finished_at: {finished_at}")
+    if wall_seconds is not None:
+        lines.append(f"wall_seconds: {wall_seconds:.3f}")
+        lines.append(f"wall_time_hms: {_fmt_hms(wall_seconds)}")
 
     lines.append(f"missing_test_count: {len(missing_test_ids)}")
     if missing_test_ids:
@@ -378,6 +404,10 @@ def main() -> None:
 
     args = ap.parse_args()
 
+    # ---- whole-run timing start (covers discovery -> workers -> merge -> summary) ----
+    run_start_ts = time.time()
+    started_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(run_start_ts))
+
     # Reduce CPU contention (good default for multi-proc)
     os.environ.setdefault("OMP_NUM_THREADS", "1")
     os.environ.setdefault("MKL_NUM_THREADS", "1")
@@ -399,6 +429,10 @@ def main() -> None:
         all_out.parent.mkdir(parents=True, exist_ok=True)
         empty_df.to_csv(all_out, index=False)
 
+        run_end_ts = time.time()
+        finished_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(run_end_ts))
+        wall_seconds = run_end_ts - run_start_ts
+
         write_summary_txt(
             out_txt=summary_txt,
             root=root,
@@ -408,6 +442,9 @@ def main() -> None:
             failed_ids=[],
             avg_acc=None,
             topn_avgs={},
+            wall_seconds=wall_seconds,
+            started_at=started_at,
+            finished_at=finished_at,
         )
         print("No dataset pairs found. Wrote empty outputs.")
         return
@@ -454,7 +491,6 @@ def main() -> None:
         pass
 
     task_queue: mp.Queue = mp.Queue()  # unbounded, won't block before workers start
-    #task_queue: mp.Queue = mp.Queue(maxsize=workers * 4)
 
     # Enqueue all tasks
     for train_csv, test_csv in pairs:
@@ -529,6 +565,11 @@ def main() -> None:
         )
         failed_ids = sorted(set(failed_ids))
 
+    # ---- whole-run timing end ----
+    run_end_ts = time.time()
+    finished_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(run_end_ts))
+    wall_seconds = run_end_ts - run_start_ts
+
     write_summary_txt(
         out_txt=summary_txt,
         root=root,
@@ -538,12 +579,16 @@ def main() -> None:
         failed_ids=failed_ids,
         avg_acc=avg_acc,
         topn_avgs=topn_avgs,
+        wall_seconds=wall_seconds,
+        started_at=started_at,
+        finished_at=finished_at,
     )
 
     # Print config for reproducibility
     print("\nSaved per-worker CSVs to:", str(out_dir))
     print("Saved merged ALL CSV to:", str(all_out))
     print("Saved summary TXT to:", str(summary_txt))
+    print(f"\nTotal wall time: {wall_seconds:.3f}s ({_fmt_hms(wall_seconds)})")
     print("\nTabICL kwargs:")
     print(json.dumps(clf_kwargs, indent=2, ensure_ascii=False))
 
