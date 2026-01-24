@@ -57,7 +57,18 @@ COMMON_ARGS="
 "
 
 # =========================
-# 1️⃣ OpenML-CC18
+# 1️⃣ TALENT
+# =========================
+echo "===== Running TALENT (dynamic ${WORKERS} workers) ====="
+${PYTHON} ${SCRIPT} \
+  --root "${DATA_ROOT}/talent_csv" \
+  --out-dir "${OUT_ROOT}/talent" \
+  --all-out "${OUT_ROOT}/tabicl_talent.ALL.csv" \
+  --summary-txt "${OUT_ROOT}/tabicl_talent.summary.txt" \
+  ${COMMON_ARGS}
+
+# =========================
+# 2️⃣ OpenML-CC18
 # =========================
 echo "===== Running OpenML-CC18 (dynamic ${WORKERS} workers) ====="
 ${PYTHON} ${SCRIPT} \
@@ -68,7 +79,7 @@ ${PYTHON} ${SCRIPT} \
   ${COMMON_ARGS}
 
 # =========================
-# 2️⃣ TabZilla
+# 3️⃣ TabZilla
 # =========================
 echo "===== Running TabZilla (dynamic ${WORKERS} workers) ====="
 ${PYTHON} ${SCRIPT} \
@@ -78,16 +89,6 @@ ${PYTHON} ${SCRIPT} \
   --summary-txt "${OUT_ROOT}/tabicl_tabzilla.summary.txt" \
   ${COMMON_ARGS}
 
-# =========================
-# 3️⃣ TALENT
-# =========================
-echo "===== Running TALENT (dynamic ${WORKERS} workers) ====="
-${PYTHON} ${SCRIPT} \
-  --root "${DATA_ROOT}/talent_csv" \
-  --out-dir "${OUT_ROOT}/talent" \
-  --all-out "${OUT_ROOT}/tabicl_talent.ALL.csv" \
-  --summary-txt "${OUT_ROOT}/tabicl_talent.summary.txt" \
-  ${COMMON_ARGS}
 
 echo "✅ All datasets finished."
 echo "Results saved in: ${OUT_ROOT}"
