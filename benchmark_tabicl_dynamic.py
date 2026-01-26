@@ -40,6 +40,7 @@ from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Optional, Tuple, List, Dict
 
+import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score, f1_score, log_loss
 from sklearn.exceptions import UndefinedMetricWarning
@@ -173,23 +174,38 @@ def run_one_dataset_with_clf(
         clf.fit(X_train, y_train)
         fit_s = time.time() - t0
 
+        # ---- IMPORTANT SPEED FIX ----
+        # Avoid doing:
+        #   y_pred = clf.predict(X_test)        (internally calls predict_proba)
+        #   proba  = clf.predict_proba(X_test) (runs inference AGAIN)
+        #
+        # If y_test exists, we call predict_proba ONCE, derive y_pred from it,
+        # and reuse the same proba for logloss.
         t1 = time.time()
-        y_pred = clf.predict(X_test)
+        if y_test is not None:
+            try:
+                proba = clf.predict_proba(X_test)
+                # Derive predicted labels from proba (same labels space as clf.classes_)
+                y_pred = clf.classes_[np.argmax(proba, axis=1)]
+                ll = log_loss(y_test, proba, labels=clf.classes_)
+            except Exception:
+                # Fallback to predict if proba/logloss computation fails
+                y_pred = clf.predict(X_test)
+                proba = None
+                ll = None
+        else:
+            # Keep original behavior: don't compute proba when y_test is missing
+            y_pred = clf.predict(X_test)
+            proba = None
+            ll = None
         pred_s = time.time() - t1
 
         if y_test is not None:
             acc = accuracy_score(y_test, y_pred)
             f1w = f1_score(y_test, y_pred, average="weighted")
-
-            try:
-                proba = clf.predict_proba(X_test)
-                ll = log_loss(y_test, proba, labels=clf.classes_)
-            except Exception:
-                ll = None
-
             n_classes = getattr(clf, "n_classes_", None)
         else:
-            acc = f1w = ll = None
+            acc = f1w = None
             n_classes = int(y_train.nunique())
 
         return ResultRow(
