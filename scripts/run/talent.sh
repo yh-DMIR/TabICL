@@ -8,7 +8,7 @@ PYTHON=python
 SCRIPT=benchmark_tabicl_dynamic.py
 
 DATA_ROOT=limix
-OUT_ROOT=results/v1.1_dynamic
+OUT_ROOT=results/test
 mkdir -p "${OUT_ROOT}"
 
 # =========================

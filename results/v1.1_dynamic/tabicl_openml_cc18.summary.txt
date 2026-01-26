@@ -1,0 +1,14 @@
+root: limix/openml_cc18_csv
+discovered_pairs: 72
+processed_pairs: 72
+started_at: 2026-01-25 21:20:52
+finished_at: 2026-01-26 00:31:03
+wall_seconds: 11410.815
+wall_time_hms: 3:10:11
+missing_test_count: 0
+missing_test_datasets: (none)
+failed_count: 0
+failed_datasets: (none)
+avg_accuracy_ok: 0.875451
+avg_accuracy_ok_top_27: 0.982829
+avg_accuracy_ok_top_63: 0.919482

@@ -1,0 +1,9 @@
+root: limix/tabzilla_csv
+discovered_pairs: 35
+processed_pairs: 35
+missing_test_count: 0
+missing_test_datasets: (none)
+failed_count: 0
+failed_datasets: (none)
+avg_accuracy_ok: 0.836244
+avg_accuracy_ok_top_27: 0.882519

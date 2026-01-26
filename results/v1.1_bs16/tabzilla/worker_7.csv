@@ -1,0 +1,2 @@
+dataset_id,n_train,n_test,n_features,n_classes,accuracy,f1_weighted,logloss,fit_seconds,predict_seconds,status,error
+OpenML-ID-1169,431506,107877,7,2,0.6614106806826293,0.6510938371872362,0.6140184882581599,15.707866907119751,2519.660611629486,ok,

@@ -1,0 +1,8 @@
+root: limix/tabzilla_csv
+discovered_pairs: 0
+processed_pairs: 0
+missing_test_count: 0
+missing_test_datasets: (none)
+failed_count: 0
+failed_datasets: (none)
+avg_accuracy_ok: (none)
