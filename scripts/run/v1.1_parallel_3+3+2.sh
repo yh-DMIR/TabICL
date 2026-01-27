@@ -36,7 +36,7 @@ echo "🚀 Launching TALENT(0,1,2) + TabZilla(3,4,5) + OpenML-CC18(6,7) in paral
     --all-out "${OUT_ROOT}/tabicl_talent.ALL.csv" \
     --summary-txt "${OUT_ROOT}/tabicl_talent.summary.txt" \
     --workers 3 \
-    --gpus 0,3,2 \
+    --gpus 0,1,2 \
     ${COMMON_ARGS}
 ) &
 
@@ -48,7 +48,7 @@ echo "🚀 Launching TALENT(0,1,2) + TabZilla(3,4,5) + OpenML-CC18(6,7) in paral
     --all-out "${OUT_ROOT}/tabicl_tabzilla.ALL.csv" \
     --summary-txt "${OUT_ROOT}/tabicl_tabzilla.summary.txt" \
     --workers 3 \
-    --gpus 1,4,7 \
+    --gpus 3,4,5 \
     ${COMMON_ARGS}
 ) &
 
@@ -60,7 +60,7 @@ echo "🚀 Launching TALENT(0,1,2) + TabZilla(3,4,5) + OpenML-CC18(6,7) in paral
     --all-out "${OUT_ROOT}/tabicl_openml_cc18.ALL.csv" \
     --summary-txt "${OUT_ROOT}/tabicl_openml_cc18.summary.txt" \
     --workers 2 \
-    --gpus 6,5 \
+    --gpus 6,7 \
     ${COMMON_ARGS}
 ) &
 
