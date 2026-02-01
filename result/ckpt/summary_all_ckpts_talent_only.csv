@@ -1,0 +1,2 @@
+ckpt,ckpt_path,started_at,finished_at,total_wall_seconds,\
+talent_avg_acc,talent_wall_seconds,talent_discovered_pairs,talent_processed_pairs,talent_failed_count,talent_missing_test_count
