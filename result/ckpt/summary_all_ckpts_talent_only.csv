@@ -1,2 +1,3 @@
-ckpt,ckpt_path,started_at,finished_at,total_wall_seconds,\
-talent_avg_acc,talent_wall_seconds,talent_discovered_pairs,talent_processed_pairs,talent_failed_count,talent_missing_test_count
+ckpt,ckpt_path,started_at,finished_at,total_wall_seconds,talent_avg_acc,talent_wall_seconds,talent_discovered_pairs,talent_processed_pairs,talent_failed_count,talent_missing_test_count
+step-100.ckpt,/vast/users/guangyi.chen/causal_group/zijian.li/LDM/tabicl_new/tabicl/stabe1/checkpoint/dir4/step-100.ckpt,2026-02-01 02:36:26,2026-02-01 02:40:16,229.184000,0.486578,229.184,175,175,0,0
+step-1000.ckpt,/vast/users/guangyi.chen/causal_group/zijian.li/LDM/tabicl_new/tabicl/stabe1/checkpoint/dir4/step-1000.ckpt,2026-02-01 02:40:16,2026-02-01 02:44:11,233.585000,0.551740,233.585,175,175,0,0
