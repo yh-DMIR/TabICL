@@ -12,7 +12,7 @@ set -euo pipefail
 PYTHON=${PYTHON:-python}
 
 # 使用带 skip + priority 的版本（你之前下载的那个）
-SCRIPT=${SCRIPT:-benchmark_tabicl_dynamic_skip_priority.py}
+SCRIPT=${SCRIPT:-benchmark_tabicl_dynamic_skip.py}
 
 # ckpt 目录（dir4）
 CKPT_DIR=${CKPT_DIR:-/vast/users/guangyi.chen/causal_group/zijian.li/LDM/tabicl_new/tabicl/stabe1/checkpoint/dir4}
