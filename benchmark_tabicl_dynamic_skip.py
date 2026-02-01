@@ -83,6 +83,36 @@ def should_skip_dataset(train_path: Path) -> bool:
     ds_id = sanitize_dataset_id(train_path)
     return (ds_dir in SKIP_DATASETS) or (ds_id in SKIP_DATASETS)
 
+
+# -----------------------------
+# Dataset prioritization
+# -----------------------------
+# These datasets will be scheduled first (if present).
+PRIORITY_DATASETS = [
+    "customer_satisfaction_in_airline",
+    # keep both spellings to be safe (folder names vary)
+    "diabetes_130-us_hospitals",
+    "dabetes_130-us_hospitals",
+    "Credit_c",
+    "SDSS17",
+    "volkert",
+]
+_PRIORITY_INDEX = {name: i for i, name in enumerate(PRIORITY_DATASETS)}
+
+def dataset_sort_key(train_path: Path):
+    """Sort key: prioritize certain datasets, then keep deterministic ordering."""
+    ds_dir = train_path.parent.name
+    ds_id = sanitize_dataset_id(train_path)
+
+    # match either directory name or inferred dataset id
+    if ds_dir in _PRIORITY_INDEX:
+        return (0, _PRIORITY_INDEX[ds_dir], ds_dir, str(train_path))
+    if ds_id in _PRIORITY_INDEX:
+        return (0, _PRIORITY_INDEX[ds_id], ds_id, str(train_path))
+
+    return (1, 10**9, ds_id, str(train_path))
+
+
 def find_dataset_pairs(root: Path) -> List[Tuple[Path, Path]]:
     pairs: List[Tuple[Path, Path]] = []
     for train_path in root.rglob("*_train.csv"):
@@ -91,7 +121,7 @@ def find_dataset_pairs(root: Path) -> List[Tuple[Path, Path]]:
         test_path = train_path.with_name(train_path.name.replace("_train.csv", "_test.csv"))
         if test_path.exists():
             pairs.append((train_path, test_path))
-    return sorted(pairs, key=lambda x: str(x[0]))
+    return sorted(pairs, key=lambda x: dataset_sort_key(x[0]))
 
 
 def find_missing_test_datasets(root: Path) -> List[str]:

@@ -6,42 +6,41 @@ export TMP=/tmp/$USER
 #!/usr/bin/env bash
 set -euo pipefail
 
-# =========================
-# 1) 路径与脚本设置（按需改）
-# =========================
+# ============================================================
+# Config
+# ============================================================
 PYTHON=${PYTHON:-python}
 
-# 使用带 skip 的版本
-SCRIPT=${SCRIPT:-benchmark_tabicl_dynamic_skip.py}
+# 使用带 skip + priority 的版本（你之前下载的那个）
+SCRIPT=${SCRIPT:-benchmark_tabicl_dynamic_skip_priority.py}
 
-# 你的 ckpt 目录（指定 dir4）
+# ckpt 目录（dir4）
 CKPT_DIR=${CKPT_DIR:-/vast/users/guangyi.chen/causal_group/zijian.li/LDM/tabicl_new/tabicl/stabe1/checkpoint/dir4}
 
 # 只跑 talent
 DATA_ROOT=${DATA_ROOT:-limix}
 TALENT_ROOT="${DATA_ROOT}/talent_csv"
 
-# 输出根目录
+# 输出
 OUT_ROOT=${OUT_ROOT:-result/ckpt}
+
+# 断点续跑：支持环境变量或第一个参数
+# 用法：
+#   bash ckpt.sh                      # 从头跑
+#   bash ckpt.sh step-29400.ckpt      # 从这个 ckpt 开始跑（包含它）
+#   START_CKPT_NAME=step-29400.ckpt bash ckpt.sh
+START_CKPT_NAME="${START_CKPT_NAME:-${1:-}}"
+
+# 是否跳过已完成（默认跳过）
+SKIP_DONE="${SKIP_DONE:-1}"   # 1=跳过已完成，0=强制重跑
 
 # GPU/worker 设置
 WORKERS=${WORKERS:-8}
 GPUS=${GPUS:-"0,1,2,3,4,5,6,7"}
 
-# TabICL checkpoint version（如果你提供 --model-path 本地 ckpt，这个更多是兼容参数）
+# checkpoint version（兼容参数；实际会用 --model-path 本地 ckpt）
 CKPT_VERSION=${CKPT_VERSION:-tabicl-classifier-v1.1-0506.ckpt}
 
-# 断点续跑：从某个 ckpt 名称开始（例如 step-29400.ckpt）
-# 用法示例：
-#   START_CKPT_NAME=step-29400.ckpt bash run_dir4_ckpts_talent_resume.sh
-# 或者：
-#   bash run_dir4_ckpts_talent_resume.sh step-29400.ckpt
-START_CKPT_NAME="${START_CKPT_NAME:-${1:-}}"
-
-# 是否跳过已记录的 ckpt（默认跳过）
-SKIP_DONE="${SKIP_DONE:-1}"   # 1=跳过已完成，0=不跳过（强制重跑）
-
-# 通用运行参数（保持你之前那套）
 export OMP_NUM_THREADS=1
 export MKL_NUM_THREADS=1
 
@@ -61,10 +60,11 @@ COMMON_ARGS="
 mkdir -p "${OUT_ROOT}"
 
 MASTER_CSV="${OUT_ROOT}/summary_all_ckpts_talent_only.csv"
+LOCK_FILE="${MASTER_CSV}.lock"
 
-# =========================
-# 2) 检查 CKPT_DIR 是否存在 + 是否有 ckpt
-# =========================
+# ============================================================
+# Checks: CKPT_DIR and ckpts
+# ============================================================
 if [[ ! -d "${CKPT_DIR}" ]]; then
   echo "❌ CKPT_DIR 不存在: ${CKPT_DIR}"
   exit 1
@@ -80,38 +80,44 @@ fi
 echo "✅ CKPT_DIR OK: ${CKPT_DIR}"
 echo "✅ Found ckpts: ${#CKPTS[@]}"
 
-# =========================
-# 3) master csv：不存在就写表头，存在就续写
-# =========================
+# ============================================================
+# Master CSV header (write once)
+# ============================================================
 if [[ ! -f "${MASTER_CSV}" ]]; then
   cat > "${MASTER_CSV}" <<'CSV'
-ckpt,ckpt_path,started_at,finished_at,total_wall_seconds,\
-talent_avg_acc,talent_wall_seconds,talent_discovered_pairs,talent_processed_pairs,talent_failed_count,talent_missing_test_count
+ckpt,ckpt_path,started_at,finished_at,total_wall_seconds,talent_avg_acc,talent_wall_seconds,talent_discovered_pairs,talent_processed_pairs,talent_failed_count,talent_missing_test_count
 CSV
-  echo "✅ Created master CSV with header: ${MASTER_CSV}"
+  echo "✅ Created master CSV: ${MASTER_CSV}"
 else
   echo "✅ Master CSV exists, will append: ${MASTER_CSV}"
 fi
 
-# =========================
-# 工具函数：解析 summary txt
-# =========================
+# ============================================================
+# Helpers
+# ============================================================
 parse_summary_field () {
   local summary_txt="$1"
   local key="$2"
   awk -F': ' -v k="${key}" '$1==k {print $2; found=1} END{if(!found) print ""}' "${summary_txt}"
 }
 
-# 判断 master csv 是否已有 ckpt 记录（按第一列 ckpt 精确匹配）
 csv_has_ckpt () {
   local ckpt_name="$1"
-  # 跳过表头，从第二行开始
   awk -F',' -v k="${ckpt_name}" 'NR>1 && $1==k {found=1} END{exit(found?0:1)}' "${MASTER_CSV}"
 }
 
-# =========================
-# 跑 talent 单数据集
-# =========================
+append_csv_row_locked () {
+  # 参数按列顺序传入
+  # 使用 flock 防止并发写坏 CSV
+  {
+    flock 200
+    printf '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n' "$@"
+  } 200>"${LOCK_FILE}" >> "${MASTER_CSV}"
+}
+
+# ============================================================
+# Run talent (stdout only returns summary path; logs go to file)
+# ============================================================
 run_talent () {
   local out_dir="$1"
   local ckpt_path="$2"
@@ -120,22 +126,27 @@ run_talent () {
 
   local all_out="${out_dir}/tabicl_talent.ALL.csv"
   local summary_txt="${out_dir}/tabicl_talent.summary.txt"
+  local run_log="${out_dir}/tabicl_talent.run.log"
 
   echo "===== Running talent with ckpt: ${ckpt_path} ====="
+  echo "      log -> ${run_log}"
+
+  # 关键修复：不要把 python 的 stdout 混进变量（否则会导致 file name too long）
   ${PYTHON} ${SCRIPT} \
     --root "${TALENT_ROOT}" \
     --out-dir "${out_dir}/talent" \
     --all-out "${all_out}" \
     --summary-txt "${summary_txt}" \
     --model-path "${ckpt_path}" \
-    ${COMMON_ARGS}
+    ${COMMON_ARGS} \
+    > "${run_log}" 2>&1
 
   echo "${summary_txt}"
 }
 
-# =========================
-# 4) 计算起始 index：从 START_CKPT_NAME 开始（如果提供）
-# =========================
+# ============================================================
+# Resume index
+# ============================================================
 start_idx=0
 if [[ -n "${START_CKPT_NAME}" ]]; then
   found=0
@@ -156,20 +167,18 @@ else
   echo "✅ No START_CKPT_NAME provided, run from beginning."
 fi
 
-# =========================
-# 5) 主循环：从 start_idx 开始遍历
-# =========================
+# ============================================================
+# Main loop
+# ============================================================
 for (( idx=start_idx; idx<${#CKPTS[@]}; idx++ )); do
   ckpt_abs="${CKPTS[$idx]}"
   ckpt_base="$(basename "${ckpt_abs}")"
   ckpt_stem="${ckpt_base%.ckpt}"
   ckpt_out="${OUT_ROOT}/${ckpt_stem}"
 
-  # 用 summary 文件作为“已完成”的辅助判断
   summary_done_file="${ckpt_out}/tabicl_talent.summary.txt"
 
   if [[ "${SKIP_DONE}" == "1" ]]; then
-    # 如果 master csv 已经记录过该 ckpt 或者 summary 文件存在，则跳过
     if csv_has_ckpt "${ckpt_base}"; then
       echo "⏭️  Skip (already in master CSV): ${ckpt_base}"
       continue
@@ -191,12 +200,12 @@ for (( idx=start_idx; idx<${#CKPTS[@]}; idx++ )); do
 
   started_at="$(date '+%Y-%m-%d %H:%M:%S')"
 
-  # 只跑 talent
+  # run
   talent_summary="$(run_talent "${ckpt_out}" "${ckpt_abs}")"
 
   finished_at="$(date '+%Y-%m-%d %H:%M:%S')"
 
-  # 取 talent summary 字段
+  # parse summary fields
   talent_avg_acc="$(parse_summary_field "${talent_summary}" "avg_accuracy_ok")"
   talent_wall_seconds="$(parse_summary_field "${talent_summary}" "wall_seconds")"
   talent_discovered_pairs="$(parse_summary_field "${talent_summary}" "discovered_pairs")"
@@ -204,7 +213,7 @@ for (( idx=start_idx; idx<${#CKPTS[@]}; idx++ )); do
   talent_failed_count="$(parse_summary_field "${talent_summary}" "failed_count")"
   talent_missing_test_count="$(parse_summary_field "${talent_summary}" "missing_test_count")"
 
-  total_wall_seconds="$(python - <<PY
+  total_wall_seconds="$(${PYTHON} - <<PY
 def f(x):
     try:
         return float(x)
@@ -214,12 +223,23 @@ print(f"{f('${talent_wall_seconds}'):.6f}")
 PY
 )"
 
-  echo "${ckpt_base},${ckpt_abs},${started_at},${finished_at},${total_wall_seconds},\
-${talent_avg_acc},${talent_wall_seconds},${talent_discovered_pairs},${talent_processed_pairs},${talent_failed_count},${talent_missing_test_count}" \
-  >> "${MASTER_CSV}"
+  # append to master csv (locked)
+  append_csv_row_locked \
+    "${ckpt_base}" \
+    "${ckpt_abs}" \
+    "${started_at}" \
+    "${finished_at}" \
+    "${total_wall_seconds}" \
+    "${talent_avg_acc}" \
+    "${talent_wall_seconds}" \
+    "${talent_discovered_pairs}" \
+    "${talent_processed_pairs}" \
+    "${talent_failed_count}" \
+    "${talent_missing_test_count}"
 
   echo "✅ Done ckpt: ${ckpt_base}"
   echo "   - outputs: ${ckpt_out}"
+  echo "   - summary: ${talent_summary}"
   echo "   - master : ${MASTER_CSV}"
 done
 
