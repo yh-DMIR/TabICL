@@ -1,3 +1,10 @@
 ckpt,ckpt_path,started_at,finished_at,total_wall_seconds,talent_avg_acc,talent_wall_seconds,talent_discovered_pairs,talent_processed_pairs,talent_failed_count,talent_missing_test_count
 step-100.ckpt,/vast/users/guangyi.chen/causal_group/zijian.li/LDM/tabicl_new/tabicl/stabe1/checkpoint/dir4/step-100.ckpt,2026-02-01 02:36:26,2026-02-01 02:40:16,229.184000,0.486578,229.184,175,175,0,0
 step-1000.ckpt,/vast/users/guangyi.chen/causal_group/zijian.li/LDM/tabicl_new/tabicl/stabe1/checkpoint/dir4/step-1000.ckpt,2026-02-01 02:40:16,2026-02-01 02:44:11,233.585000,0.551740,233.585,175,175,0,0
+step-10000.ckpt,/vast/users/guangyi.chen/causal_group/zijian.li/LDM/tabicl_new/tabicl/stabe1/checkpoint/dir4/step-10000.ckpt,2026-02-01 02:44:11,2026-02-01 02:48:09,236.788000,0.793689,236.788,175,175,0,0
+step-10050.ckpt,/vast/users/guangyi.chen/causal_group/zijian.li/LDM/tabicl_new/tabicl/stabe1/checkpoint/dir4/step-10050.ckpt,2026-02-01 02:48:09,2026-02-01 02:52:07,236.923000,0.794226,236.923,175,175,0,0
+step-10100.ckpt,/vast/users/guangyi.chen/causal_group/zijian.li/LDM/tabicl_new/tabicl/stabe1/checkpoint/dir4/step-10100.ckpt,2026-02-01 02:52:07,2026-02-01 02:56:05,236.891000,0.793674,236.891,175,175,0,0
+step-10150.ckpt,/vast/users/guangyi.chen/causal_group/zijian.li/LDM/tabicl_new/tabicl/stabe1/checkpoint/dir4/step-10150.ckpt,2026-02-01 02:56:05,2026-02-01 03:00:02,236.321000,0.793579,236.321,175,175,0,0
+step-10200.ckpt,/vast/users/guangyi.chen/causal_group/zijian.li/LDM/tabicl_new/tabicl/stabe1/checkpoint/dir4/step-10200.ckpt,2026-02-01 03:00:02,2026-02-01 03:04:02,238.714000,0.797087,238.714,175,175,0,0
+step-10250.ckpt,/vast/users/guangyi.chen/causal_group/zijian.li/LDM/tabicl_new/tabicl/stabe1/checkpoint/dir4/step-10250.ckpt,2026-02-01 03:04:02,2026-02-01 03:08:00,236.761000,0.792736,236.761,175,175,0,0
+step-10300.ckpt,/vast/users/guangyi.chen/causal_group/zijian.li/LDM/tabicl_new/tabicl/stabe1/checkpoint/dir4/step-10300.ckpt,2026-02-01 03:08:00,2026-02-01 03:11:58,236.431000,0.793332,236.431,175,175,0,0
