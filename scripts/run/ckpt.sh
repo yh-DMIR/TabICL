@@ -128,10 +128,10 @@ run_talent () {
   local summary_txt="${out_dir}/tabicl_talent.summary.txt"
   local run_log="${out_dir}/tabicl_talent.run.log"
 
-  echo "===== Running talent with ckpt: ${ckpt_path} ====="
-  echo "      log -> ${run_log}"
+  # ✅ 所有提示信息都打到 stderr，避免污染 stdout（stdout 只留给 summary path）
+  echo "===== Running talent with ckpt: ${ckpt_path} =====" >&2
+  echo "      log -> ${run_log}" >&2
 
-  # 关键修复：不要把 python 的 stdout 混进变量（否则会导致 file name too long）
   ${PYTHON} ${SCRIPT} \
     --root "${TALENT_ROOT}" \
     --out-dir "${out_dir}/talent" \
@@ -141,8 +141,10 @@ run_talent () {
     ${COMMON_ARGS} \
     > "${run_log}" 2>&1
 
+  # ✅ stdout 只输出路径
   echo "${summary_txt}"
 }
+
 
 # ============================================================
 # Resume index
