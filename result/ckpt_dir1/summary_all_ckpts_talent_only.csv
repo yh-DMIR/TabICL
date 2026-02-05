@@ -1,0 +1,7 @@
+ckpt,ckpt_path,started_at,finished_at,total_wall_seconds,talent_avg_acc,talent_wall_seconds,talent_discovered_pairs,talent_processed_pairs,talent_failed_count,talent_missing_test_count
+step-100.ckpt,/vast/users/guangyi.chen/causal_group/zijian.li/LDM/tabicl_new/tabicl/stabe1/checkpoint/dir1/step-100.ckpt,2026-02-05 15:04:01,2026-02-05 15:07:59,236.939000,0.425533,236.939,175,175,0,0
+step-1000.ckpt,/vast/users/guangyi.chen/causal_group/zijian.li/LDM/tabicl_new/tabicl/stabe1/checkpoint/dir1/step-1000.ckpt,2026-02-05 15:07:59,2026-02-05 15:11:57,236.590000,0.624030,236.590,175,175,0,0
+step-10000.ckpt,/vast/users/guangyi.chen/causal_group/zijian.li/LDM/tabicl_new/tabicl/stabe1/checkpoint/dir1/step-10000.ckpt,2026-02-05 15:11:57,2026-02-05 15:15:57,238.721000,0.760051,238.721,175,175,0,0
+step-50.ckpt,/vast/users/guangyi.chen/causal_group/zijian.li/LDM/tabicl_new/tabicl/stabe1/checkpoint/dir1/step-50.ckpt,2026-02-05 15:22:07,2026-02-05 15:26:05,236.561000,0.379319,236.561,175,175,0,0
+step-150.ckpt,/vast/users/guangyi.chen/causal_group/zijian.li/LDM/tabicl_new/tabicl/stabe1/checkpoint/dir1/step-150.ckpt,2026-02-05 15:26:05,2026-02-05 15:30:01,235.403000,0.475779,235.403,175,175,0,0
+step-200.ckpt,/vast/users/guangyi.chen/causal_group/zijian.li/LDM/tabicl_new/tabicl/stabe1/checkpoint/dir1/step-200.ckpt,2026-02-05 15:30:01,2026-02-05 15:33:57,234.674000,0.496625,234.674,175,175,0,0
