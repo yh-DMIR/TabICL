@@ -1,3 +1,8 @@
+mkdir -p /tmp/$USER/comgr
+export TMPDIR=/tmp/$USER
+export TEMP=/tmp/$USER
+export TMP=/tmp/$USER
+
 #!/usr/bin/env bash
 set -euo pipefail
 
