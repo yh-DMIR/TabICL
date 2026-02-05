@@ -11,36 +11,40 @@ set -euo pipefail
 # ============================================================
 PYTHON=${PYTHON:-python}
 
-# 你的 benchmark 脚本（建议用绝对路径更稳）
+# 使用带 skip + priority 的版本
 SCRIPT=${SCRIPT:-benchmark_tabicl_dynamic_skip.py}
 
-# ckpt 目录
-CKPT_DIR=${CKPT_DIR:-/vast/users/guangyi.chen/causal_group/zijian.li/LDM/tabicl_new/tabicl/stabe1/checkpoint/dir1}
+# ckpt 目录（dir4）
+CKPT_DIR=${CKPT_DIR:-/vast/users/guangyi.chen/causal_group/zijian.li/LDM/tabicl_new/tabicl/stabe1/checkpoint/dir4}
 
 # 只跑 talent
 DATA_ROOT=${DATA_ROOT:-limix}
 TALENT_ROOT="${DATA_ROOT}/talent_csv"
 
-# 输出目录
-OUT_ROOT=${OUT_ROOT:-result/ckpt_dir1}
+# 输出
+OUT_ROOT=${OUT_ROOT:-result/ckpt}
 
-# 断点：只处理 step >= MIN_STEP
+# 断点续跑（可选）：若设置则会跳过 step 小于它的 ckpt（按数值比较）
+# 用法：
+#   MIN_STEP=29400 bash ckpt.sh
 MIN_STEP="${MIN_STEP:-0}"
 
-# 是否跳过已完成
+# 是否跳过已完成（默认跳过）
 SKIP_DONE="${SKIP_DONE:-1}"   # 1=跳过已完成，0=强制重跑
 
-# GPU/worker
+# GPU/worker 设置
 WORKERS=${WORKERS:-8}
 GPUS=${GPUS:-"0,1,2,3,4,5,6,7"}
 
-# checkpoint version（兼容参数）
+# checkpoint version（兼容参数；实际会用 --model-path 本地 ckpt）
 CKPT_VERSION=${CKPT_VERSION:-tabicl-classifier-v1.1-0506.ckpt}
 
-# 队列空时等待策略
+# 当队列空时：
+# - 若系统有 inotifywait：阻塞等待目录变化（真正“被唤醒”）
+# - 否则：每 SLEEP_SECS 轮询一次
 SLEEP_SECS="${SLEEP_SECS:-60}"
 
-# “写完判定”：文件大小连续 STABLE_ROUNDS 次不变
+# “写完判定”：文件大小连续 STABLE_ROUNDS 次不变才认为 ready
 STABLE_ROUNDS="${STABLE_ROUNDS:-3}"
 STABLE_INTERVAL_SECS="${STABLE_INTERVAL_SECS:-5}"
 
@@ -75,7 +79,7 @@ fi
 echo "✅ CKPT_DIR OK: ${CKPT_DIR}"
 
 # ============================================================
-# Master CSV header
+# Master CSV header (write once)
 # ============================================================
 if [[ ! -f "${MASTER_CSV}" ]]; then
   cat > "${MASTER_CSV}" <<'CSV'
@@ -87,30 +91,6 @@ else
 fi
 
 # ============================================================
-# In-memory state (FIX BUG)
-# ============================================================
-# 已完成/已记录（ckpt_base -> 1）
-declare -A PROCESSED=()
-
-# 已忽略（ckpt_abs -> 1）：用于“skip 后不再入队”
-declare -A IGNORED=()
-
-load_processed_from_master_csv () {
-  PROCESSED=()
-  # 只读第 1 列（ckpt 名），跳过 header
-  # 兼容空文件/读失败
-  if [[ -f "${MASTER_CSV}" ]]; then
-    while IFS=, read -r ckpt_name _rest; do
-      [[ "${ckpt_name}" == "ckpt" ]] && continue
-      [[ -n "${ckpt_name}" ]] && PROCESSED["${ckpt_name}"]=1
-    done < "${MASTER_CSV}" || true
-  fi
-}
-
-# 初始加载一次
-load_processed_from_master_csv
-
-# ============================================================
 # Helpers
 # ============================================================
 parse_summary_field () {
@@ -119,10 +99,9 @@ parse_summary_field () {
   awk -F': ' -v k="${key}" '$1==k {print $2; found=1} END{if(!found) print ""}' "${summary_txt}"
 }
 
-# 用内存 PROCESSED 判断（不再频繁 awk，且不会出现“明明写了 CSV 但判断不到”的怪现象）
 csv_has_ckpt () {
   local ckpt_name="$1"
-  [[ -n "${PROCESSED[${ckpt_name}]+x}" ]]
+  awk -F',' -v k="${ckpt_name}" 'NR>1 && $1==k {found=1} END{exit(found?0:1)}' "${MASTER_CSV}"
 }
 
 append_csv_row_locked () {
@@ -130,13 +109,10 @@ append_csv_row_locked () {
     flock 200
     printf '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n' "$@"
   } 200>"${LOCK_FILE}" >> "${MASTER_CSV}"
-
-  # 立即同步到内存集合，避免下一轮 refill 又把它加入队列
-  local ckpt_name="$1"
-  PROCESSED["${ckpt_name}"]=1
 }
 
-# 从文件名里提取 step：step-19450.ckpt -> 19450
+# 从文件名里提取 step 数值：step-19450.ckpt -> 19450
+# 若不匹配，返回 -1
 extract_step () {
   local base="$1"
   if [[ "${base}" =~ step-([0-9]+)\.ckpt$ ]]; then
@@ -152,6 +128,10 @@ wait_for_ckpt_ready () {
   local rounds="${STABLE_ROUNDS}"
   local interval="${STABLE_INTERVAL_SECS}"
 
+  if [[ ! -f "${f}" ]]; then
+    return 1
+  fi
+
   local last_size="-1"
   local stable=0
 
@@ -163,6 +143,7 @@ wait_for_ckpt_ready () {
       continue
     fi
 
+    # stat 在不同系统略有差异，这里用 GNU coreutils 的格式；若失败则重试
     local sz
     if ! sz="$(stat -c %s "${f}" 2>/dev/null)"; then
       sleep "${interval}"
@@ -185,7 +166,7 @@ wait_for_ckpt_ready () {
 }
 
 # ============================================================
-# Run talent
+# Run talent (stdout only returns summary path; logs go to file)
 # ============================================================
 run_talent () {
   local out_dir="$1"
@@ -215,55 +196,46 @@ run_talent () {
 # ============================================================
 # Pending queue logic
 # ============================================================
+# 维护一个 pending 列表（字符串数组），内容是 ckpt 的绝对路径
 declare -a PENDING=()
+# 防止重复入队：用一个 set（关联数组）
 declare -A IN_PENDING=()
 
+# 把当前目录里“未处理”的 ckpt 按 step 数值排序后加入 pending
 refill_pending_from_dir () {
   local tmp
   tmp="$(mktemp)"
 
-  # 每次 refill 前，保证 PROCESSED 是最新（如果你担心别的进程也在写 CSV）
-  # 这行开销很小，但能避免“多进程并发”时的漏判
-  load_processed_from_master_csv
-
+  # 生成：step<TAB>path 的列表（只收集符合 MIN_STEP 且未处理且不在 pending 的）
   while IFS= read -r f; do
-    # 已忽略（skip 过）就不再考虑
-    if [[ -n "${IGNORED[${f}]+x}" ]]; then
-      continue
-    fi
-
     local base step
     base="$(basename "${f}")"
     step="$(extract_step "${base}")"
 
-    # 不符合命名规则就跳过
+    # 若不含 step-数字，则跳过（你也可以改成放到最后：step=-1 也入队）
     if (( step < 0 )); then
       continue
     fi
 
-    # 断点：step 必须 >= MIN_STEP
     if (( step < MIN_STEP )); then
       continue
     fi
 
-    # 已处理就不入队
     if [[ "${SKIP_DONE}" == "1" ]]; then
+      # master CSV 已有 或 summary 已存在 → 认为已处理
       local ckpt_stem="${base%.ckpt}"
       local ckpt_out="${OUT_ROOT}/${ckpt_stem}"
       local summary_done_file="${ckpt_out}/tabicl_talent.summary.txt"
 
       if csv_has_ckpt "${base}"; then
-        # 直接加入 IGNORED，彻底避免重复扫描再入队
-        IGNORED["${f}"]=1
         continue
       fi
       if [[ -f "${summary_done_file}" ]]; then
-        IGNORED["${f}"]=1
         continue
       fi
     fi
 
-    # 已在 pending 就不重复入队
+    # 已在 pending 则不重复入队
     if [[ -n "${IN_PENDING[${f}]+x}" ]]; then
       continue
     fi
@@ -271,8 +243,9 @@ refill_pending_from_dir () {
     printf '%s\t%s\n' "${step}" "${f}" >> "${tmp}"
   done < <(find "${CKPT_DIR}" -maxdepth 1 -type f -name "*.ckpt" 2>/dev/null)
 
+  # 按 step 数值排序
   if [[ -s "${tmp}" ]]; then
-    while IFS=$'\t' read -r _step f; do
+    while IFS=$'\t' read -r step f; do
       PENDING+=("${f}")
       IN_PENDING["${f}"]=1
     done < <(sort -n -k1,1 "${tmp}")
@@ -281,6 +254,7 @@ refill_pending_from_dir () {
   rm -f "${tmp}"
 }
 
+# 从 pending 弹出队首
 pop_pending () {
   local f="${PENDING[0]:-}"
   if [[ -z "${f}" ]]; then
@@ -292,8 +266,11 @@ pop_pending () {
   echo "${f}"
 }
 
+# 队列为空时等待（优先 inotifywait，否则 sleep）
 wait_until_dir_changes () {
   if command -v inotifywait >/dev/null 2>&1; then
+    # 监听：创建/写完/rename 到目录
+    # 某些训练会先写 tmp 再 mv，所以 moved_to 很关键
     inotifywait -q -e create -e close_write -e moved_to "${CKPT_DIR}" >/dev/null 2>&1 || true
   else
     sleep "${SLEEP_SECS}"
@@ -310,30 +287,31 @@ echo "   - If queue empty: inotifywait(if exists) else sleep ${SLEEP_SECS}s"
 echo "   - Ready check: size stable ${STABLE_ROUNDS} rounds, interval ${STABLE_INTERVAL_SECS}s"
 
 while true; do
+  # 尝试补充队列（catch up + 防丢事件）
   refill_pending_from_dir
 
+  # 如果队列为空：阻塞等待目录变化，然后继续循环
   if [[ ${#PENDING[@]} -eq 0 ]]; then
     echo "⏳ Queue empty. Waiting for new ckpt in ${CKPT_DIR} ..."
     wait_until_dir_changes
     continue
   fi
 
+  # 取下一个 ckpt（step 最小的）
   ckpt_abs="$(pop_pending)"
   ckpt_base="$(basename "${ckpt_abs}")"
   ckpt_stem="${ckpt_base%.ckpt}"
   ckpt_out="${OUT_ROOT}/${ckpt_stem}"
   summary_done_file="${ckpt_out}/tabicl_talent.summary.txt"
 
-  # 再次 double-check：如果已处理，直接忽略（并写入 IGNORED 防止再次入队）
+  # 再次 double-check（并发/重复运行时更稳）
   if [[ "${SKIP_DONE}" == "1" ]]; then
     if csv_has_ckpt "${ckpt_base}"; then
       echo "⏭️  Skip (already in master CSV): ${ckpt_base}"
-      IGNORED["${ckpt_abs}"]=1
       continue
     fi
     if [[ -f "${summary_done_file}" ]]; then
       echo "⏭️  Skip (summary exists): ${ckpt_base} -> ${summary_done_file}"
-      IGNORED["${ckpt_abs}"]=1
       continue
     fi
   fi
@@ -345,6 +323,7 @@ while true; do
   echo "### OUT : ${ckpt_out}"
   echo "#################################################################"
 
+  # 等待 ckpt 写完
   echo "⏱️  Waiting ckpt ready (size stable): ${ckpt_abs}"
   wait_for_ckpt_ready "${ckpt_abs}"
   echo "✅ CKPT ready: ${ckpt_abs}"
@@ -352,9 +331,11 @@ while true; do
   mkdir -p "${ckpt_out}"
   started_at="$(date '+%Y-%m-%d %H:%M:%S')"
 
+  # run
   talent_summary="$(run_talent "${ckpt_out}" "${ckpt_abs}")"
   finished_at="$(date '+%Y-%m-%d %H:%M:%S')"
 
+  # parse summary fields
   talent_avg_acc="$(parse_summary_field "${talent_summary}" "avg_accuracy_ok")"
   talent_wall_seconds="$(parse_summary_field "${talent_summary}" "wall_seconds")"
   talent_discovered_pairs="$(parse_summary_field "${talent_summary}" "discovered_pairs")"
@@ -372,6 +353,7 @@ print(f"{f('${talent_wall_seconds}'):.6f}")
 PY
 )"
 
+  # append to master csv (locked)
   append_csv_row_locked \
     "${ckpt_base}" \
     "${ckpt_abs}" \
@@ -385,11 +367,10 @@ PY
     "${talent_failed_count}" \
     "${talent_missing_test_count}"
 
-  # 跑完也加入 IGNORED（防止再次被入队）
-  IGNORED["${ckpt_abs}"]=1
-
   echo "✅ Done ckpt: ${ckpt_base}"
   echo "   - outputs: ${ckpt_out}"
   echo "   - summary: ${talent_summary}"
   echo "   - master : ${MASTER_CSV}"
+
+  # 继续 while：会自动补队列；若没新 ckpt 就等待
 done
