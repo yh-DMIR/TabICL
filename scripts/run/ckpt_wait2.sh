@@ -140,12 +140,36 @@ scan_ckpts () {
   local maxdepth="$2"
 
   if [[ "${maxdepth}" == "0" ]]; then
-    # recursive
-    find "${dir}" -type f -name "*.ckpt" 2>/dev/null | sort
+    find "${dir}" -type f -name "*.ckpt" 2>/dev/null \
+      | awk -F'[/.-]' '
+          {
+            for (i=1;i<=NF;i++) {
+              if ($i=="step") {
+                step=$(i+1)
+                printf "%012d %s\n", step, $0
+              }
+            }
+          }
+        ' \
+      | sort -n \
+      | cut -d' ' -f2-
   else
-    find "${dir}" -maxdepth "${maxdepth}" -type f -name "*.ckpt" 2>/dev/null | sort
+    find "${dir}" -maxdepth "${maxdepth}" -type f -name "*.ckpt" 2>/dev/null \
+      | awk -F'[/.-]' '
+          {
+            for (i=1;i<=NF;i++) {
+              if ($i=="step") {
+                step=$(i+1)
+                printf "%012d %s\n", step, $0
+              }
+            }
+          }
+        ' \
+      | sort -n \
+      | cut -d' ' -f2-
   fi
 }
+
 
 # ============================================================
 # Run talent (stdout only returns summary path; logs go to file)
