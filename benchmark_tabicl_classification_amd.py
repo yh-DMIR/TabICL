@@ -212,22 +212,15 @@ def run_worker(
     verbose: bool,
 ) -> None:
     try:
-        gpu_id_str = str(gpu_id)
-        os.environ["ROCR_VISIBLE_DEVICES"] = gpu_id_str
-        os.environ["HIP_VISIBLE_DEVICES"] = gpu_id_str
-        os.environ.pop("CUDA_VISIBLE_DEVICES", None)
-        os.environ.pop("GPU_DEVICE_ORDINAL", None)
+        os.environ["HIP_VISIBLE_DEVICES"] = str(gpu_id)
         os.environ.setdefault("OMP_NUM_THREADS", "1")
         os.environ.setdefault("MKL_NUM_THREADS", "1")
 
-        import torch
         from tabicl import TabICLClassifier
 
-        if not torch.cuda.is_available():
-            raise RuntimeError("GPU backend is not available in this worker.")
-
         worker_kwargs = dict(model_kwargs)
-        worker_kwargs["device"] = "cuda:0"
+        if not worker_kwargs.get("device"):
+            worker_kwargs["device"] = "cuda:0"
         clf = TabICLClassifier(**worker_kwargs)
 
         ready_queue.put(
@@ -366,6 +359,7 @@ def main() -> None:
     parser.add_argument("--model-path", default="tabicl-classifier-v1.1-0506.ckpt")
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument("--gpus", default="0,1,2,3,4,5,6,7")
+    parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--batch-size", type=int, default=4)
     parser.add_argument("--n-estimators", type=int, default=32)
     parser.add_argument("--norm-methods", default="none,power")
@@ -407,6 +401,7 @@ def main() -> None:
         "checkpoint_version": args.checkpoint_version,
         "model_path": str(model_path),
         "allow_auto_download": False,
+        "device": args.device,
         "batch_size": args.batch_size,
         "n_estimators": args.n_estimators,
         "norm_methods": norm_methods,
