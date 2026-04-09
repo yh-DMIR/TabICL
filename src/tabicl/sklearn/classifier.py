@@ -24,6 +24,13 @@ from tabicl import TabICL
 
 warnings.filterwarnings("ignore", category=FutureWarning, module="sklearn")
 OLD_SKLEARN = version.parse(sklearn.__version__) < version.parse("1.6")
+KNOWN_MISSING_STATE_DICT_PREFIXES = (
+    "row_interactor.repr_ln.",
+    "icl_predictor.reliability_head.",
+)
+KNOWN_UNEXPECTED_STATE_DICT_KEYS = {
+    "row_interactor.tf_row.rope.freqs",
+}
 
 
 class TabICLClassifier(ClassifierMixin, BaseEstimator):
@@ -323,7 +330,23 @@ class TabICLClassifier(ClassifierMixin, BaseEstimator):
 
         self.model_path_ = model_path_
         self.model_ = TabICL(**checkpoint["config"])
-        self.model_.load_state_dict(checkpoint["state_dict"])
+        incompatible = self.model_.load_state_dict(checkpoint["state_dict"], strict=False)
+
+        missing_keys = [
+            key for key in incompatible.missing_keys
+            if not any(key.startswith(prefix) for prefix in KNOWN_MISSING_STATE_DICT_PREFIXES)
+        ]
+        unexpected_keys = [
+            key for key in incompatible.unexpected_keys
+            if key not in KNOWN_UNEXPECTED_STATE_DICT_KEYS
+        ]
+
+        if missing_keys or unexpected_keys:
+            raise ValueError(
+                "Checkpoint is incompatible with the current TabICL model. "
+                f"Missing keys: {missing_keys}. Unexpected keys: {unexpected_keys}."
+            )
+
         self.model_.eval()
 
     def fit(self, X, y):
@@ -373,8 +396,9 @@ class TabICLClassifier(ClassifierMixin, BaseEstimator):
         else:
             self.device_ = self.device
 
-        # Load the pre-trained TabICL model
-        self._load_model()
+        # Load the pre-trained TabICL model once and reuse it across repeated fit/predict cycles.
+        if not hasattr(self, "model_"):
+            self._load_model()
         self.model_.to(self.device_)
 
         # Inference configuration
