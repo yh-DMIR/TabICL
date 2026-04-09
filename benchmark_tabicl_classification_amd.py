@@ -8,6 +8,7 @@ import gc
 import multiprocessing as mp
 import os
 import re
+import sys
 import time
 import traceback
 from dataclasses import asdict, dataclass
@@ -18,6 +19,12 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score, f1_score, log_loss
 from sklearn.model_selection import train_test_split
+
+# Force the benchmark to import the local src-layout package instead of any site-packages install.
+REPO_ROOT = Path(__file__).resolve().parent
+SRC_ROOT = REPO_ROOT / "src"
+if str(SRC_ROOT) not in sys.path:
+    sys.path.insert(0, str(SRC_ROOT))
 
 
 DEFAULT_BENCHMARKS = [
