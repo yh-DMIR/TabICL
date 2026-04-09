@@ -223,7 +223,15 @@ def run_worker(
         os.environ.setdefault("OMP_NUM_THREADS", "1")
         os.environ.setdefault("MKL_NUM_THREADS", "1")
 
+        import tabicl
         from tabicl import TabICLClassifier
+
+        imported_from = Path(tabicl.__file__).resolve()
+        if SRC_ROOT not in imported_from.parents:
+            raise RuntimeError(
+                f"Imported tabicl from unexpected location: {imported_from}. "
+                f"Expected it to come from {SRC_ROOT}."
+            )
 
         worker_kwargs = dict(model_kwargs)
         if not worker_kwargs.get("device"):
