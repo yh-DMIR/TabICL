@@ -1,0 +1,47 @@
+dataset_id,n_train,n_test,n_features,n_classes,accuracy,f1_weighted,logloss,fit_seconds,predict_seconds,status,error
+Credit_c,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+BNG(cmc),0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+Customer_Personality_Analysis,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+FOREX_audsgd-hour-High,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+Gender_Gap_in_Spanish_WP,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+MagicTelescope,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+Pumpkin_Seeds,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+ada,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+allrep,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+company_bankruptcy_prediction,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+drug_consumption,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+estimation_of_obesity_levels,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+gas-drift,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+jungle_chess_2pcs_raw_endgame_complete,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+letter,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+mfeat-zernike,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+okcupid_stem,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+page-blocks,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+phoneme,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+satimage,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+steel_plates_faults,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+turiye_student_evaluation,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+website_phishing,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "

@@ -1,0 +1,43 @@
+dataset_id,n_train,n_test,n_features,n_classes,accuracy,f1_weighted,logloss,fit_seconds,predict_seconds,status,error
+SDSS17,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+BNG(breast-w),0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+E-CommereShippingData,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+GAMETES_Epistasis_2-Way_20atts_0.1H_EDM-1_1,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+IBM_HR_Analytics_Employee_Attrition_and_Performance,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+Mobile_Price_Classification,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+Satellite,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+ada_prior,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+bank,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+churn,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+dis,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+eye_movements,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+heloc,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+kdd_ipums_la_97-small,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+maternal_health_risk,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+mobile_c36_oversampling,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+optdigits,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+pol,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+seismic+bumps,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+texture,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+waveform_database_generator,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "

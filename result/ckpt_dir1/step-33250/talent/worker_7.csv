@@ -1,0 +1,41 @@
+dataset_id,n_train,n_test,n_features,n_classes,accuracy,f1_weighted,logloss,fit_seconds,predict_seconds,status,error
+Credit_c,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+Basketball_c,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+Customer_Personality_Analysis,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+Fitness_Club_c,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+JapaneseVowels,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+PhishingWebsites,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+Satellite,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+ada_prior,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+churn,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+default_of_credit_card_clients,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+eeg-eye-state,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+gina_agnostic,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+internet_usage,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+maternal_health_risk,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+okcupid_stem,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+pc1,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+rice_cammeo_and_osmancik,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+splice,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+thyroid,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "
+waveform_database_generator_version_1,0,0,0,,,,,0.0,0.0,fail,"RuntimeError: Error(s) in loading state_dict for TabICL:
+	Missing key(s) in state_dict: ""row_interactor.repr_ln.weight"", ""row_interactor.repr_ln.bias"". "

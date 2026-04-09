@@ -1,0 +1,2 @@
+dataset_id,n_train,n_test,n_features,n_classes,accuracy,f1_weighted,logloss,fit_seconds,predict_seconds,status,error
+customer_satisfaction_in_airline,103904,25976,21,2,0.8220280258700339,0.8222665528065535,0.41272544822111334,12.148257493972778,292.780152797699,ok,

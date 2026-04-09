@@ -131,3 +131,5 @@ dmypy.json
 # Developer environments
 .idea
 .vscode
+
+dataset/

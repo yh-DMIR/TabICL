@@ -1,0 +1,3 @@
+dataset_id,n_train,n_test,n_features,n_classes,accuracy,f1_weighted,logloss,fit_seconds,predict_seconds,status,error
+customer_satisfaction_in_airline,103904,25976,21,2,0.908761934093009,0.9089137889944722,0.2305150354457723,12.275509357452393,179.8952066898346,ok,
+naticusdroid+android+permissions+dataset,23465,5867,86,2,0.966933696949037,0.9669313836420097,0.10326126883903776,1.295832872390747,61.27209520339966,ok,

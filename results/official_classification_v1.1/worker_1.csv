@@ -1,0 +1,6 @@
+benchmark,dataset_id,dataset_dir,dataset_name,n_train,n_test,n_features,n_classes,accuracy,f1_weighted,logloss,fit_seconds,predict_seconds,status,error
+__worker__,__WORKER_CRASH__1,__worker__,__WORKER_CRASH__1,0,0,0,,,,,0.0,0.0,fail,"Traceback (most recent call last):
+  File ""/vast/users/guangyi.chen/causal_group/zijian.li/dmir_crl/lyh/TabICL/benchmark_tabicl_classification_amd.py"", line 227, in run_worker
+    raise RuntimeError(""GPU backend is not available in this worker."")
+RuntimeError: GPU backend is not available in this worker.
+"
